@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.glassfish.soteria</groupId>
             <artifactId>soteria</artifactId>
-            <version>1.0-m01</version>
+            <version>1.0-m06-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

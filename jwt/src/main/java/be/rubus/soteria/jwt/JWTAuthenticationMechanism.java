@@ -18,15 +18,16 @@ package be.rubus.soteria.jwt;
 
 import javax.inject.Inject;
 import javax.security.auth.message.AuthException;
-import javax.security.auth.message.AuthStatus;
-import javax.security.authentication.mechanism.http.HttpAuthenticationMechanism;
-import javax.security.authentication.mechanism.http.HttpMessageContext;
-import javax.security.identitystore.CredentialValidationResult;
-import javax.security.identitystore.IdentityStore;
+import javax.security.enterprise.AuthenticationStatus;
+import javax.security.enterprise.authentication.mechanism.http.HttpAuthenticationMechanism;
+import javax.security.enterprise.authentication.mechanism.http.HttpMessageContext;
+import javax.security.enterprise.identitystore.CredentialValidationResult;
+import javax.security.enterprise.identitystore.IdentityStore;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static javax.security.identitystore.CredentialValidationResult.Status.VALID;
+import static javax.security.enterprise.identitystore.CredentialValidationResult.Status.VALID;
+
 
 /**
  *
@@ -42,7 +43,7 @@ public class JWTAuthenticationMechanism implements HttpAuthenticationMechanism {
     private JWTTokenHandler tokenHandler;
 
     @Override
-    public AuthStatus validateRequest(HttpServletRequest request, HttpServletResponse response, HttpMessageContext httpMessageContext) throws AuthException {
+    public AuthenticationStatus validateRequest(HttpServletRequest request, HttpServletResponse response, HttpMessageContext httpMessageContext) throws AuthException {
 
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith(BEARER)) {

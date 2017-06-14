@@ -19,14 +19,14 @@ package be.rubus.soteria.jwe.test;
 import be.rubus.soteria.jwt.JWTUsernameCredential;
 
 import javax.annotation.PostConstruct;
-import javax.security.identitystore.CredentialValidationResult;
-import javax.security.identitystore.IdentityStore;
-import javax.security.identitystore.credential.Credential;
+import javax.security.enterprise.credential.Credential;
+import javax.security.enterprise.identitystore.CredentialValidationResult;
+import javax.security.enterprise.identitystore.IdentityStore;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -49,7 +49,7 @@ public class JwtIdentityStore implements IdentityStore {
         CredentialValidationResult result;
         if (credential instanceof JWTUsernameCredential) {
             // This means we had a valid JWT/JWE.
-            String caller = credential.getCaller();
+            String caller = ((JWTUsernameCredential) credential).getCaller();
 
             // Does the userName match the apiKey
             JWTUsernameCredential jwtCredential = (JWTUsernameCredential) credential;
@@ -59,7 +59,7 @@ public class JwtIdentityStore implements IdentityStore {
                 result = CredentialValidationResult.INVALID_RESULT;
             } else {
 
-                List<String> groupAssignment = new ArrayList<>(); // Here just machine to machine authentication;
+                Set<String> groupAssignment = new HashSet<>(); // Here just machine to machine authentication;
                 result = new CredentialValidationResult(caller, groupAssignment);
             }
         } else {

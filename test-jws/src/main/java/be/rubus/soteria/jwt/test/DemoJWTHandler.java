@@ -75,7 +75,7 @@ public class DemoJWTHandler implements JWTTokenHandler {
                 }
             }
         } catch (ParseException | JOSEException e) {
-            ; // Token is nog valid
+            ; // Token is not valid
         }
         return result;
     }

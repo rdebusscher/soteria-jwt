@@ -16,7 +16,7 @@
  */
 package be.rubus.soteria.jwt;
 
-import javax.security.identitystore.credential.Credential;
+import javax.security.enterprise.credential.Credential;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +35,6 @@ public class JWTUsernameCredential implements Credential {
         info = new HashMap<>();
     }
 
-    @Override
     public String getCaller() {
         return caller;
     }
