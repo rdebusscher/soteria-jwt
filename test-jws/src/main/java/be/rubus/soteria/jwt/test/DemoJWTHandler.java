@@ -16,19 +16,19 @@
  */
 package be.rubus.soteria.jwt.test;
 
+import be.rubus.soteria.jwt.JWTCredential;
 import be.rubus.soteria.jwt.JWTTokenHandler;
-import be.rubus.soteria.jwt.JWTUsernameCredential;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 import javax.annotation.PostConstruct;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -36,6 +36,7 @@ import java.util.Map;
 public class DemoJWTHandler implements JWTTokenHandler {
 
     public static final String API_KEY = "xApiKey";
+    public static final String ROLES = "xApiKey";
 
     private Map<String, byte[]> keys;
     //          key , hash key
@@ -48,8 +49,8 @@ public class DemoJWTHandler implements JWTTokenHandler {
     }
 
     @Override
-    public JWTUsernameCredential retrieveCredential(String token) {
-        JWTUsernameCredential result = null;
+    public JWTCredential retrieveCredential(String token) {
+        JWTCredential result = null;
         try {
             JWSObject jws = JWSObject.parse(token);
 
@@ -69,7 +70,14 @@ public class DemoJWTHandler implements JWTTokenHandler {
                     long validityPeriod = expirationTime.getTime() - creationTime.getTime();
                     if (creationTime.before(now) && now.before(expirationTime) && validityPeriod < 120000 /*2 minutes*/) {
 
-                        result = new JWTUsernameCredential(claimsSet.getSubject());
+                        JSONObject realmAccess = (JSONObject) claimsSet.getClaim("realm_access");
+
+                        JSONArray rolesArray = (JSONArray) realmAccess.get("roles");
+
+                        Set<String> roles = new HashSet<>();
+                        rolesArray.forEach(r -> roles.add(r.toString()));
+
+                        result = new JWTCredential(claimsSet.getSubject(), roles);
                         result.addInfo(API_KEY, apiKey);
                     }
                 }

@@ -17,8 +17,8 @@
 package be.rubus.soteria.jwe.test;
 
 import be.rubus.soteria.jwe.cli.JWEMain;
+import be.rubus.soteria.jwt.JWTCredential;
 import be.rubus.soteria.jwt.JWTTokenHandler;
-import be.rubus.soteria.jwt.JWTUsernameCredential;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEObject;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -27,12 +27,16 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  *
@@ -54,8 +58,8 @@ public class DemoJWTHandler implements JWTTokenHandler {
     }
 
     @Override
-    public JWTUsernameCredential retrieveCredential(String token) {
-        JWTUsernameCredential result = null;
+    public JWTCredential retrieveCredential(String token) {
+        JWTCredential result = null;
         try {
             // Parse the JWE string
             JWEObject jweObject = JWEObject.parse(token);
@@ -84,7 +88,15 @@ public class DemoJWTHandler implements JWTTokenHandler {
             long validityPeriod = expirationTime.getTime() - creationTime.getTime();
             if (creationTime.before(now) && now.before(expirationTime) && validityPeriod < 120000 /*2 minutes*/) {
 
-                result = new JWTUsernameCredential(claimsSet.getSubject());
+                JSONObject realmAccess = (JSONObject) claimsSet.getClaim("realm_access");
+
+                JSONArray rolesArray = (JSONArray) realmAccess.get("roles");
+
+                Set<String> roles = new HashSet<>();
+                rolesArray.forEach(r -> roles.add(r.toString()));
+
+                result = new JWTCredential(claimsSet.getSubject(), roles);
+                result.addInfo(API_KEY, apiKey);
                 result.addInfo(API_KEY, apiKey);
             }
 

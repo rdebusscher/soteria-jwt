@@ -18,20 +18,29 @@ package be.rubus.soteria.jwt;
 
 import javax.security.enterprise.credential.Credential;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
  */
-public class JWTUsernameCredential implements Credential {
+public class JWTCredential implements Credential {
 
     private String caller;
 
     private Map<String, Serializable> info;
 
-    public JWTUsernameCredential(String caller) {
+    private Set<String> roles;
+
+    public JWTCredential(String caller) {
+        this(caller, Collections.emptySet());
+    }
+
+    public JWTCredential(String caller, Set<String> roles) {
         this.caller = caller;
+        this.roles = roles;
         info = new HashMap<>();
     }
 
@@ -41,6 +50,10 @@ public class JWTUsernameCredential implements Credential {
 
     public void addInfo(String key, Serializable value) {
         info.put(key, value);
+    }
+
+    public Set<String> getRoles() {
+        return roles;
     }
 
     // TODO Consider Generic Type like

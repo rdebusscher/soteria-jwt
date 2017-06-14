@@ -20,11 +20,10 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import net.minidev.json.JSONArray;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -34,8 +33,8 @@ public class JwsMain {
     public static void main(String[] args) throws JOSEException, ParseException {
         List<Info> data = new ArrayList<>();
 
-        data.add(new Info("Key Soteria", "Soteria RI", "ILoveJavaEESecurityWithSoteriaRI".getBytes()));
-        data.add(new Info("Key Alphabet", "Alphabet", "Thelynxdrankfivemojitosatthepub!".getBytes()));
+        data.add(new Info("Key Soteria", "Soteria RI", "ILoveJavaEESecurityWithSoteriaRI".getBytes(), newRoles("user", "manager")));
+        data.add(new Info("Key Alphabet", "Alphabet", "Thelynxdrankfivemojitosatthepub!".getBytes(), newRoles("user")));
 
         System.out.println("Correct tokens");
         data.forEach(
@@ -43,11 +42,15 @@ public class JwsMain {
         );
 
         System.out.println("Incorrect tokens");
-        Info info = new Info(data.get(0).apiKey, data.get(1).getUserName(), data.get(0).getHashKey());
+        Info info = new Info(data.get(0).apiKey, data.get(1).getUserName(), data.get(0).getHashKey(), Collections.emptyList());
         System.out.println("(Signed with wrong key for subject) Subject = " + info.getUserName() + " -> token = " + createToken(info));
 
-        info = new Info(data.get(1).apiKey, data.get(1).getUserName(), data.get(0).getHashKey());
+        info = new Info(data.get(1).apiKey, data.get(1).getUserName(), data.get(0).getHashKey(), Collections.emptyList());
         System.out.println("(key does not match api key) Subject = " + info.getUserName() + " -> token = " + createToken(info));
+    }
+
+    private static List<String> newRoles(String... roles) {
+        return new ArrayList<>(Arrays.asList(roles));
     }
 
     private static String createToken(Info info) {
@@ -56,6 +59,14 @@ public class JwsMain {
 
         claimsSetBuilder.issueTime(new Date());
         claimsSetBuilder.expirationTime(new Date(new Date().getTime() + 60 * 1000));
+
+        JSONArray roleValues = new JSONArray();
+        roleValues.addAll(info.getRoles());
+
+        Map<String, Object> roles = new HashMap<>();
+        roles.put("roles", roleValues);
+
+        claimsSetBuilder.claim("realm_access", roles);
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256).type(JOSEObjectType.JWT).keyID(info.getApiKey()).build();
         SignedJWT signedJWT = new SignedJWT(header, claimsSetBuilder.build());
@@ -76,11 +87,13 @@ public class JwsMain {
         private String apiKey;
         private String userName;
         private byte[] hashKey;
+        private List<String> roles;
 
-        public Info(String apiKey, String userName, byte[] hashKey) {
+        public Info(String apiKey, String userName, byte[] hashKey, List<String> roles) {
             this.apiKey = apiKey;
             this.userName = userName;
             this.hashKey = hashKey;
+            this.roles = roles;
         }
 
         public String getApiKey() {
@@ -93,6 +106,10 @@ public class JwsMain {
 
         public byte[] getHashKey() {
             return hashKey;
+        }
+
+        public List<String> getRoles() {
+            return roles;
         }
     }
 }

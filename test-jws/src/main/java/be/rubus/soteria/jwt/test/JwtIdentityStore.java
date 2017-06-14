@@ -16,7 +16,7 @@
  */
 package be.rubus.soteria.jwt.test;
 
-import be.rubus.soteria.jwt.JWTUsernameCredential;
+import be.rubus.soteria.jwt.JWTCredential;
 
 import javax.annotation.PostConstruct;
 import javax.security.enterprise.credential.Credential;
@@ -24,9 +24,7 @@ import javax.security.enterprise.identitystore.CredentialValidationResult;
 import javax.security.enterprise.identitystore.IdentityStore;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *
@@ -47,20 +45,20 @@ public class JwtIdentityStore implements IdentityStore {
     @Override
     public CredentialValidationResult validate(Credential credential) {
         CredentialValidationResult result;
-        if (credential instanceof JWTUsernameCredential) {
+        if (credential instanceof JWTCredential) {
 
             // This means we had a valid JWT, so user is valid.
-            String caller = ((JWTUsernameCredential) credential).getCaller();
+            JWTCredential jwtCredential = (JWTCredential) credential;
+            String caller = jwtCredential.getCaller();
 
             // Does the userName match the apiKey
-            JWTUsernameCredential jwtCredential = (JWTUsernameCredential) credential;
             Serializable xApiKey = jwtCredential.getInfo(DemoJWTHandler.API_KEY);
             if (xApiKey == null || !xApiKey.equals(users.get(caller))) {
 
                 result = CredentialValidationResult.INVALID_RESULT;
             } else {
-                Set<String> groupAssignment = new HashSet<>();
-                result = new CredentialValidationResult(caller, groupAssignment);
+
+                result = new CredentialValidationResult(caller, jwtCredential.getRoles());
             }
         } else {
             result = CredentialValidationResult.INVALID_RESULT;

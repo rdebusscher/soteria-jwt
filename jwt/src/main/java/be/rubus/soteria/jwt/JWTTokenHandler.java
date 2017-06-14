@@ -21,5 +21,5 @@ package be.rubus.soteria.jwt;
  */
 public interface JWTTokenHandler {
 
-    JWTUsernameCredential retrieveCredential(String token);
+    JWTCredential retrieveCredential(String token);
 }

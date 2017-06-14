@@ -49,7 +49,7 @@ public class JWTAuthenticationMechanism implements HttpAuthenticationMechanism {
         if (authorizationHeader != null && authorizationHeader.startsWith(BEARER)) {
             String token = authorizationHeader.substring(BEARER.length());
 
-            JWTUsernameCredential credential = tokenHandler.retrieveCredential(token);
+            JWTCredential credential = tokenHandler.retrieveCredential(token);
 
             CredentialValidationResult result = identityStore.validate(credential);
 

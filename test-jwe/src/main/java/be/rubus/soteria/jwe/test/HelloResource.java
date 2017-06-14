@@ -32,6 +32,13 @@ public class HelloResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String sayHello(@Context SecurityContext context) {
-        return "hello " + context.getUserPrincipal().getName();
+        return "hello " + context.getUserPrincipal().getName() +
+                " - " + checkRole(context, "user") +
+                " - " + checkRole(context, "manager") +
+                " - " + checkRole(context, "nonexisting");
+    }
+
+    private String checkRole(SecurityContext context, String roleName) {
+        return String.format("Caller has role '%s' ?= %s", roleName, context.isUserInRole(roleName));
     }
 }
