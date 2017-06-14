@@ -16,7 +16,7 @@ This repository contains all the code to integrate with Soteria, JWT framework (
 
 ### Update 14/6/2017
 
-Updated the examples to include authentication, compatible with the [https://github.com/eclipse/microprofile-evolution-process/blob/master/proposals/0005-jwt-rbac.md](Microprofile JWT Proposal)
+Updated the examples to include authorization, compatible with the [https://github.com/eclipse/microprofile-evolution-process/blob/master/proposals/0005-jwt-rbac.md] (Microprofile JWT Proposal)
 
 Generated tokens contain now 'Role' information like
 
